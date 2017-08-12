@@ -19,7 +19,7 @@ public class HttpMethod {
     private static HttpMethod sInstance = null;
     private static final Object LOCK = new Object();
 
-    private static final long TIME_OUT = 10;
+    private static final long TIME_OUT = 60;
 
     private HttpMethod() {
 

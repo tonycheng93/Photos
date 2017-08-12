@@ -45,9 +45,10 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
         }
     }
 
-    public void loadPhotos(int page, int perPage) {
+    public void loadPhotos(final int page, int perPage) {
         checkViewAttached();
-        getMvpView().showLoading();
+        if (page == 1)
+            getMvpView().showLoading();
         mDataManager.getPhotos(page, perPage)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -60,7 +61,8 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
                     @Override
                     public void onNext(@NonNull List<Photo> photos) {
                         Log.d(TAG, "onNext: " + new Gson().toJson(photos));
-                        getMvpView().hideLoading();
+                        if (page == 1)
+                            getMvpView().hideLoading();
                         if (photos.isEmpty()) {
                             getMvpView().showPhotoEmpty();
                         } else {
@@ -70,9 +72,10 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
 
                     @Override
                     public void onError(@NonNull Throwable e) {
-                        getMvpView().hideLoading();
+                        if (page == 1)
+                            getMvpView().hideLoading();
                         getMvpView().showError(e);
-                        if (e instanceof SocketTimeoutException){
+                        if (e instanceof SocketTimeoutException) {
                             Log.d(TAG, "onError: SocketTimeoutException");
                         }
                     }

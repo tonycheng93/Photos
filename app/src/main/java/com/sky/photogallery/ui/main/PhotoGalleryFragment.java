@@ -89,6 +89,10 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
                 public void onLoadMore() {
                     //加载更多
                     Log.d(TAG, "onLoadMore: ");
+                    if (mPhotoGalleryPresenter != null) {
+                        PAGE++;
+                        mPhotoGalleryPresenter.loadPhotos(PAGE, PER_PAGE);
+                    }
                 }
             });
             mPhotoRecyclerView.setAdapter(mLoadMoreWrapper);
@@ -97,7 +101,9 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
 
     @Override
     public void showLoading() {
-        mSwipeRefreshLayout.setRefreshing(true);
+        if (mSwipeRefreshLayout != null && !mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(true);
+        }
     }
 
     @Override
@@ -131,7 +137,9 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
 
     @Override
     public void hideLoading() {
-        mSwipeRefreshLayout.setRefreshing(false);
+        if (mSwipeRefreshLayout != null && mSwipeRefreshLayout.isRefreshing()) {
+            mSwipeRefreshLayout.setRefreshing(false);
+        }
     }
 
     @Override
