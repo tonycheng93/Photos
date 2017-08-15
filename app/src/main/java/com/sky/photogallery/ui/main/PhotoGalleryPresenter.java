@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import android.util.Log;
 
 import com.sky.photogallery.data.DataManager;
-import com.sky.photogallery.data.model.Photo;
 import com.sky.photogallery.ui.base.BasePresenter;
 
 import java.net.SocketTimeoutException;

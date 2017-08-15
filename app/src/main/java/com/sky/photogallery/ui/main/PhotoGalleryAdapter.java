@@ -10,7 +10,7 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.sky.photogallery.R;
-import com.sky.photogallery.data.model.Photo;
+import com.sky.photogallery.data.model.Result;
 
 import java.util.List;
 
@@ -21,32 +21,32 @@ import java.util.List;
 public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapter.PhotoHolder> {
 
     private Context mContext;
-    private List<Photo> mPhotos;
+    private List<Result> mResults;
 
     public PhotoGalleryAdapter(Context context) {
         mContext = context;
     }
 
-    public void setPhotos(List<Photo> photos) {
-        mPhotos = photos;
+    public void setPhotos(List<Result> photos) {
+        mResults = photos;
     }
 
 
     @Override
     public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.gallery_item,parent,false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.gallery_item, parent, false);
         return new PhotoHolder(view);
     }
 
     @Override
     public void onBindViewHolder(PhotoHolder holder, int position) {
-        final Photo photo = mPhotos.get(position);
+        final Result photo = mResults.get(position);
         holder.bindPhotoItem(photo);
     }
 
     @Override
     public int getItemCount() {
-        return mPhotos == null ? 0 : mPhotos.size();
+        return mResults == null ? 0 : mResults.size();
     }
 
     class PhotoHolder extends RecyclerView.ViewHolder {
@@ -58,9 +58,9 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
             mPhotoImageView = (ImageView) itemView.findViewById(R.id.fragment_photo_gallery_image_view);
         }
 
-        public void bindPhotoItem(Photo photo) {
-            if (photo != null && !TextUtils.isEmpty(photo.getUrlS())) {
-                Glide.with(mContext).load(photo.getUrlS());
+        public void bindPhotoItem(Result result) {
+            if (result != null && !TextUtils.isEmpty(result.getUrl())) {
+                Glide.with(mContext).load(result.getUrl());
             }
         }
     }

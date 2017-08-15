@@ -1,6 +1,6 @@
 package com.sky.photogallery.ui.main;
 
-import com.sky.photogallery.data.model.Photo;
+import com.sky.photogallery.data.model.Result;
 import com.sky.photogallery.ui.base.MvpView;
 
 import java.util.List;
@@ -19,9 +19,9 @@ public interface IPhotoGalleryView extends MvpView {
     /**
      * 填充 Photo 到试图
      *
-     * @param photos List<Photo>
+     * @param results List<Result>
      */
-    void addPhotos(List<Photo> photos);
+    void addPhotos(List<Result> results);
 
     /**
      * 显示空状态

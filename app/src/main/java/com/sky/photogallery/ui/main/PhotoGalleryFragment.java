@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.sky.photogallery.R;
-import com.sky.photogallery.data.model.Photo;
+import com.sky.photogallery.data.model.Result;
 import com.sky.photogallery.ui.widget.LoadMoreWrapper;
 
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView mPhotoRecyclerView;
-    private List<Photo> mPhotos = new ArrayList<>();
+    private List<Result> mResults = new ArrayList<>();
 
     private PhotoGalleryPresenter mPhotoGalleryPresenter;
     private PhotoGalleryAdapter mPhotoGalleryAdapter;
@@ -107,17 +107,17 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
     }
 
     @Override
-    public void addPhotos(List<Photo> photos) {
+    public void addPhotos(List<Result> results) {
         if (PAGE == 1) {
-            if (photos != null && !mPhotos.containsAll(photos)) {
-                mPhotos.addAll(0, photos);
-                mPhotoGalleryAdapter.setPhotos(mPhotos);
+            if (results != null && !mResults.containsAll(results)) {
+                mResults.addAll(0, results);
+                mPhotoGalleryAdapter.setPhotos(mResults);
                 mPhotoGalleryAdapter.notifyDataSetChanged();
             }
         } else {
-            if (photos != null && !mPhotos.containsAll(photos)) {
-                mPhotos.addAll(photos);
-                mPhotoGalleryAdapter.setPhotos(mPhotos);
+            if (results != null && !mResults.containsAll(results)) {
+                mResults.addAll(results);
+                mPhotoGalleryAdapter.setPhotos(mResults);
                 mPhotoGalleryAdapter.notifyDataSetChanged();
             }
         }
