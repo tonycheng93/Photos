@@ -60,7 +60,7 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
 
         public void bindPhotoItem(Result result) {
             if (result != null && !TextUtils.isEmpty(result.getUrl())) {
-                Glide.with(mContext).load(result.getUrl());
+                Glide.with(mContext).load(result.getUrl()).into(mPhotoImageView);
             }
         }
     }

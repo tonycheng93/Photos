@@ -17,7 +17,7 @@ public interface IPhotoGalleryView extends MvpView {
     void showLoading();
 
     /**
-     * 填充 Photo 到试图
+     * 填充 Result 到试图
      *
      * @param results List<Result>
      */

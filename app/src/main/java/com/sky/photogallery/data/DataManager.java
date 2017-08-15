@@ -1,9 +1,8 @@
 package com.sky.photogallery.data;
 
-import com.google.gson.Gson;
-
 import android.util.Log;
 
+import com.google.gson.Gson;
 import com.sky.photogallery.data.model.Result;
 import com.sky.photogallery.http.HttpListResult;
 import com.sky.photogallery.http.HttpMethod;

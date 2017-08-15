@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.sky.photogallery.R;
 import com.sky.photogallery.data.model.Result;
-import com.sky.photogallery.ui.widget.LoadMoreWrapper;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,10 +34,10 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
     private PhotoGalleryPresenter mPhotoGalleryPresenter;
     private PhotoGalleryAdapter mPhotoGalleryAdapter;
 
-    private static int PAGE = 1;
-    private static final int PER_PAGE = 10;
+    private static final int SIZE = 10;
+    private int page = 1;
 
-    private LoadMoreWrapper mLoadMoreWrapper;
+//    private LoadMoreWrapper mLoadMoreWrapper;
 
     public static PhotoGalleryFragment newInstance() {
         return new PhotoGalleryFragment();
@@ -52,20 +51,22 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable
+            Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_photo_gallery, container, false);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(mRefreshListener);
 
-        mPhotoRecyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_photo_gallery_recycler_view);
-        mPhotoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+        mPhotoRecyclerView = (RecyclerView) rootView.findViewById(R.id
+                .fragment_photo_gallery_recycler_view);
+        mPhotoRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         setupAdapter();
 
         mPhotoGalleryPresenter = new PhotoGalleryPresenter();
         mPhotoGalleryPresenter.attachView(this);
-        mPhotoGalleryPresenter.loadPhotos(PAGE, PER_PAGE);
+        mPhotoGalleryPresenter.loadPhotos(SIZE, page);
 
         return rootView;
     }
@@ -76,26 +77,28 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
      * 数据加载完成的时候调用showLoadComplete()。
      */
     private void setupAdapter() {
-        if (isAdded()) {//check whether the fragment has attached activity,otherwise getActivity() may return null.
+        if (isAdded()) {//check whether the fragment has attached activity,otherwise getActivity
+            // () may return null.
             mPhotoGalleryAdapter = new PhotoGalleryAdapter(getActivity());
-            mLoadMoreWrapper = new LoadMoreWrapper(getActivity(), mPhotoGalleryAdapter);
-            mLoadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
-                @Override
-                public void onRetry() {
-                    //重试处理
-                }
-
-                @Override
-                public void onLoadMore() {
-                    //加载更多
-                    Log.d(TAG, "onLoadMore: ");
-                    if (mPhotoGalleryPresenter != null) {
-                        PAGE++;
-                        mPhotoGalleryPresenter.loadPhotos(PAGE, PER_PAGE);
-                    }
-                }
-            });
-            mPhotoRecyclerView.setAdapter(mLoadMoreWrapper);
+//            mLoadMoreWrapper = new LoadMoreWrapper(getActivity(), mPhotoGalleryAdapter);
+//            mLoadMoreWrapper.setOnLoadListener(new LoadMoreWrapper.OnLoadListener() {
+//                @Override
+//                public void onRetry() {
+//                    //重试处理
+//                }
+//
+//                @Override
+//                public void onLoadMore() {
+//                    //加载更多
+//                    Log.d(TAG, "onLoadMore: ");
+//                    if (mPhotoGalleryPresenter != null) {
+//                        PAGE++;
+//                        mPhotoGalleryPresenter.loadPhotos(PAGE, PER_PAGE);
+//                    }
+//                }
+//            });
+            mPhotoRecyclerView.setAdapter(mPhotoGalleryAdapter);
+            mPhotoRecyclerView.addOnScrollListener(mScrollerListener);
         }
     }
 
@@ -108,14 +111,17 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
 
     @Override
     public void addPhotos(List<Result> results) {
-        if (PAGE == 1) {
-            if (results != null && !mResults.containsAll(results)) {
+        String str1 = mResults.toString();
+        String str2 = results.toString();
+        Log.d(TAG, "addPhotos: " + str1.contains(str2));
+        if (page == 1) {
+            if (results != null && !str1.contains(str2)) {
                 mResults.addAll(0, results);
                 mPhotoGalleryAdapter.setPhotos(mResults);
                 mPhotoGalleryAdapter.notifyDataSetChanged();
             }
         } else {
-            if (results != null && !mResults.containsAll(results)) {
+            if (results != null && !str1.contains(str2)) {
                 mResults.addAll(results);
                 mPhotoGalleryAdapter.setPhotos(mResults);
                 mPhotoGalleryAdapter.notifyDataSetChanged();
@@ -125,7 +131,7 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
 
     @Override
     public void showPhotoEmpty() {
-        mPhotoGalleryAdapter.setPhotos(Collections.<Photo>emptyList());
+        mPhotoGalleryAdapter.setPhotos(Collections.<Result>emptyList());
         mPhotoGalleryAdapter.notifyDataSetChanged();
         Toast.makeText(getActivity(), "photos is empty", Toast.LENGTH_SHORT).show();
     }
@@ -150,13 +156,37 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
         }
     }
 
-    private SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout.OnRefreshListener() {
+    private SwipeRefreshLayout.OnRefreshListener mRefreshListener = new SwipeRefreshLayout
+            .OnRefreshListener() {
         @Override
         public void onRefresh() {
             if (mPhotoGalleryPresenter != null) {
-                PAGE = 1;
-                mPhotoGalleryPresenter.loadPhotos(PAGE, PER_PAGE);
+                page = 1;
+                mPhotoGalleryPresenter.loadPhotos(SIZE, page);
             }
+        }
+    };
+
+    private RecyclerView.OnScrollListener mScrollerListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+            LinearLayoutManager lm = (LinearLayoutManager) recyclerView.getLayoutManager();
+            int totalItemCount = recyclerView.getAdapter().getItemCount();
+            int lastVisibleItemPosition = lm.findLastVisibleItemPosition();
+            int visibleItemCount = recyclerView.getChildCount();
+
+            if (newState == RecyclerView.SCROLL_STATE_IDLE
+                    && lastVisibleItemPosition == totalItemCount - 1
+                    && visibleItemCount > 0) {
+                //加载更多
+                page ++;
+                mPhotoGalleryPresenter.loadPhotos(SIZE,page);
+            }
+        }
+
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
         }
     };
 }
