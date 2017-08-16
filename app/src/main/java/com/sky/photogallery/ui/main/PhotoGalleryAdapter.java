@@ -27,8 +27,8 @@ public class PhotoGalleryAdapter extends RecyclerView.Adapter<PhotoGalleryAdapte
         mContext = context;
     }
 
-    public void setPhotos(List<Result> photos) {
-        mResults = photos;
+    public void setPhotos(List<Result> results) {
+        mResults = results;
     }
 
 

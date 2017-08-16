@@ -33,7 +33,7 @@ public interface IPhotoGalleryView extends MvpView {
      *
      * @param e {@link Throwable}
      */
-    void showError(Throwable e);
+    void showError();
 
     /**
      * 隐藏 loading

@@ -109,23 +109,29 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
         }
     }
 
+    private List<Result> tempList = new ArrayList<>();
+
     @Override
     public void addPhotos(List<Result> results) {
-        String str1 = mResults.toString();
-        String str2 = results.toString();
-        Log.d(TAG, "addPhotos: " + str1.contains(str2));
-        if (page == 1) {
-            if (results != null && !str1.contains(str2)) {
+
+        if (results == null) {
+            return;
+        }
+
+//        Log.d(TAG, "addPhotos: page = " + page);
+
+        if (page == 1) {//下拉刷新
+//            Log.d(TAG, "addPhotos: tempList.containsAll(results) = " + tempList.containsAll(results));
+            if (!tempList.containsAll(results)) {
+                tempList = results;
                 mResults.addAll(0, results);
                 mPhotoGalleryAdapter.setPhotos(mResults);
-                mPhotoGalleryAdapter.notifyDataSetChanged();
+                mPhotoGalleryAdapter.notifyItemRangeInserted(0, results.size());
             }
-        } else {
-            if (results != null && !str1.contains(str2)) {
-                mResults.addAll(results);
-                mPhotoGalleryAdapter.setPhotos(mResults);
-                mPhotoGalleryAdapter.notifyDataSetChanged();
-            }
+        } else {//上拉加载更多
+            mResults.addAll(results);
+            mPhotoGalleryAdapter.setPhotos(mResults);
+            mPhotoGalleryAdapter.notifyItemRangeInserted(mResults.size(), results.size());
         }
     }
 
@@ -137,8 +143,8 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
     }
 
     @Override
-    public void showError(Throwable e) {
-        Log.d(TAG, "showError: " + e.toString());
+    public void showError() {
+//        Log.d(TAG, "showError: " + e.toString());
     }
 
     @Override
@@ -179,8 +185,8 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
                     && lastVisibleItemPosition == totalItemCount - 1
                     && visibleItemCount > 0) {
                 //加载更多
-                page ++;
-                mPhotoGalleryPresenter.loadPhotos(SIZE,page);
+                page++;
+                mPhotoGalleryPresenter.loadPhotos(SIZE, page);
             }
         }
 

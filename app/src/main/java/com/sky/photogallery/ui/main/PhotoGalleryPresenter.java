@@ -2,12 +2,12 @@ package com.sky.photogallery.ui.main;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.sky.photogallery.data.DataManager;
 import com.sky.photogallery.data.model.Result;
 import com.sky.photogallery.ui.base.BasePresenter;
 
 import java.net.SocketTimeoutException;
+import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observer;
@@ -28,7 +28,11 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
     private Disposable mDisposable = null;
 
     public PhotoGalleryPresenter() {
-        mDataManager = new DataManager();
+//        mDataManager = new DataManager();
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        mDataManager = dataManager;
     }
 
     @Override
@@ -59,7 +63,7 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
 
                     @Override
                     public void onNext(@NonNull List<Result> photos) {
-                        Log.d(TAG, "onNext: " + new Gson().toJson(photos));
+//                        Log.d(TAG, "onNext: " + new Gson().toJson(photos));
                         if (page == 1)
                             getMvpView().hideLoading();
                         if (photos.isEmpty()) {
@@ -73,7 +77,7 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
                     public void onError(@NonNull Throwable e) {
                         if (page == 1)
                             getMvpView().hideLoading();
-                        getMvpView().showError(e);
+                        getMvpView().showError();
                         if (e instanceof SocketTimeoutException) {
                             Log.d(TAG, "onError: SocketTimeoutException");
                         }
