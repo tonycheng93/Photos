@@ -1,17 +1,16 @@
 package com.sky.photogallery.data;
 
-import com.sky.photogallery.utils.TestDataFactory;
 import com.sky.photogallery.data.model.Result;
 import com.sky.photogallery.ui.main.IPhotoGalleryView;
 import com.sky.photogallery.ui.main.PhotoGalleryPresenter;
 import com.sky.photogallery.utils.RxSchedulersOverrideRule;
+import com.sky.photogallery.utils.TestDataFactory;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatcher;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -65,34 +64,34 @@ public class PhotoGalleryPresenterTest {
         Mockito.verify(mIPhotoGalleryView).addPhotos(results);
         Mockito.verify(mIPhotoGalleryView, Mockito.never()).showPhotoEmpty();
         Mockito.verify(mIPhotoGalleryView, Mockito.never()).showError();
-        Mockito.verify(mIPhotoGalleryView,Mockito.times(2)).hideLoading();//onNext() and onComplete() will invoke hideLoading()
+        Mockito.verify(mIPhotoGalleryView, Mockito.times(2)).hideLoading();//onNext() and onComplete() will invoke hideLoading()
     }
 
     @Test
-    public void loadPhotosReturnsEmptyList(){
+    public void loadPhotosReturnsEmptyList() {
         List<Result> results = new ArrayList<>();
-        Mockito.when(mDataManager.getGanks(Mockito.anyInt(),Mockito.anyInt()))
+        Mockito.when(mDataManager.getGanks(Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(Observable.just(results));
 
-        mPhotoGalleryPresenter.loadPhotos(10,1);
+        mPhotoGalleryPresenter.loadPhotos(10, 1);
 
         Mockito.verify(mIPhotoGalleryView).showLoading();
         Mockito.verify(mIPhotoGalleryView).showPhotoEmpty();
-        Mockito.verify(mIPhotoGalleryView,Mockito.never()).addPhotos(ArgumentMatchers.<Result>anyList());
-        Mockito.verify(mIPhotoGalleryView,Mockito.never()).showError();
-        Mockito.verify(mIPhotoGalleryView,Mockito.times(2)).hideLoading();
+        Mockito.verify(mIPhotoGalleryView, Mockito.never()).addPhotos(ArgumentMatchers.<Result>anyList());
+        Mockito.verify(mIPhotoGalleryView, Mockito.never()).showError();
+        Mockito.verify(mIPhotoGalleryView, Mockito.times(2)).hideLoading();
     }
 
     @Test
-    public void loadPhotosFails(){
-        Mockito.when(mDataManager.getGanks(Mockito.anyInt(),Mockito.anyInt()))
+    public void loadPhotosFails() {
+        Mockito.when(mDataManager.getGanks(Mockito.anyInt(), Mockito.anyInt()))
                 .thenReturn(Observable.<List<Result>>error(new Throwable()));
 
-        mPhotoGalleryPresenter.loadPhotos(10,1);
+        mPhotoGalleryPresenter.loadPhotos(10, 1);
 
         Mockito.verify(mIPhotoGalleryView).showLoading();
-        Mockito.verify(mIPhotoGalleryView,Mockito.never()).showPhotoEmpty();
-        Mockito.verify(mIPhotoGalleryView,Mockito.never()).addPhotos(ArgumentMatchers.<Result>anyList());
+        Mockito.verify(mIPhotoGalleryView, Mockito.never()).showPhotoEmpty();
+        Mockito.verify(mIPhotoGalleryView, Mockito.never()).addPhotos(ArgumentMatchers.<Result>anyList());
         Mockito.verify(mIPhotoGalleryView).showError();
         Mockito.verify(mIPhotoGalleryView).hideLoading();
     }

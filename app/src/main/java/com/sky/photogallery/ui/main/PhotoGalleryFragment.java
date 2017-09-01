@@ -1,8 +1,12 @@
 package com.sky.photogallery.ui.main;
 
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,10 +18,24 @@ import android.widget.Toast;
 
 import com.sky.photogallery.R;
 import com.sky.photogallery.data.model.Result;
+import com.sky.photogallery.receiver.CountDownReceiver;
+import com.sky.photogallery.service.CountDownService;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import io.reactivex.Observable;
+import io.reactivex.ObservableEmitter;
+import io.reactivex.ObservableOnSubscribe;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.annotations.NonNull;
+import io.reactivex.functions.Consumer;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
  * Created by tonycheng on 2017/8/9.
@@ -62,11 +80,58 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
                 .fragment_photo_gallery_recycler_view);
         mPhotoRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        setupAdapter();
+//        setupAdapter();
+//
+//        mPhotoGalleryPresenter = new PhotoGalleryPresenter();
+//        mPhotoGalleryPresenter.attachView(this);
+//        mPhotoGalleryPresenter.loadPhotos(SIZE, page);
 
-        mPhotoGalleryPresenter = new PhotoGalleryPresenter();
-        mPhotoGalleryPresenter.attachView(this);
-        mPhotoGalleryPresenter.loadPhotos(SIZE, page);
+        test();
+
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+            String sdcardPath = Environment.getExternalStorageDirectory().getPath();
+            File file = new File(sdcardPath);
+            if (file.exists()) {
+                final boolean directory = file.isDirectory();
+                Log.d(TAG, "file is directory = " + directory);
+                final File[] files = file.listFiles();
+                Log.d(TAG, "files = " + files);
+                if (files != null && files.length > 0) {
+                    for (File f : files) {
+                        Log.d(TAG, "file name = " + f.getName());
+                    }
+                } else {
+                    Log.d(TAG, "files == null or files.length == 0");
+                }
+            } else {
+                Log.d(TAG, "file does not exists.");
+            }
+        } else {
+            Log.d(TAG, "sdcard is not mounted.");
+        }
+
+        Intent intent = CountDownService.newIntent(getActivity());
+        intent.putExtra("time",30000L);
+        getActivity().startService(intent);
+
+//        CountDownService.newInstance(getActivity());
+//        CountDownTimer timer = new CountDownTimer(30000, 30000) {
+//            @Override
+//            public void onTick(long millisUntilFinished) {
+//                Log.d(TAG, "onTick: current thread = " + Thread.currentThread().getName());
+//            }
+//
+//            @Override
+//            public void onFinish() {
+//                Log.d(TAG, "onFinish: current thread name = " + Thread.currentThread().getName());
+//            }
+//        }.start();
+
+//        CountDownReceiver receiver = new CountDownReceiver();
+//        IntentFilter filter = new IntentFilter();
+//        filter.addAction(CountDownReceiver.RECEIVER_ACTION);
+//        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(receiver, filter);
+//        getActivity().registerReceiver(receiver,filter);
 
         return rootView;
     }
@@ -195,4 +260,33 @@ public class PhotoGalleryFragment extends Fragment implements IPhotoGalleryView 
             super.onScrolled(recyclerView, dx, dy);
         }
     };
+
+    private void test() {
+        Observable.create(new ObservableOnSubscribe<String>() {
+            @Override
+            public void subscribe(final @NonNull ObservableEmitter<String> e) throws Exception {
+                OkHttpClient client = new OkHttpClient();
+                Request request = new Request.Builder()
+                        .url("http://www.baidu.com")
+                        .build();
+                final Response response = client.newCall(request).execute();
+                e.onNext(response.body().string());
+                e.onComplete();
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<String>() {
+                    @Override
+                    public void accept(String s) throws Exception {
+                        Log.d(TAG, "current thread = " + Thread.currentThread().getName());
+                        Log.d(TAG, "accept: " + s);
+                    }
+                });
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }

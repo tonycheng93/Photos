@@ -1,3 +1,6 @@
 <resources>
     <string name="app_name">PhotoGallery</string>
+
+    <string name="msg">您今天的观看时长已结束,\n让眼睛休息一会</string>
+    <string name="time">%1$s分钟</string>
 </resources>

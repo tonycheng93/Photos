@@ -4,10 +4,11 @@ import android.util.Log;
 
 import com.sky.photogallery.data.DataManager;
 import com.sky.photogallery.data.model.Result;
+import com.sky.photogallery.http.CustomObserver;
+import com.sky.photogallery.http.exception.ApiException;
 import com.sky.photogallery.ui.base.BasePresenter;
 
 import java.net.SocketTimeoutException;
-import java.util.Collections;
 import java.util.List;
 
 import io.reactivex.Observer;
@@ -28,7 +29,7 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
     private Disposable mDisposable = null;
 
     public PhotoGalleryPresenter() {
-//        mDataManager = new DataManager();
+        mDataManager = new DataManager();
     }
 
     public void setDataManager(DataManager dataManager) {
@@ -53,9 +54,9 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
         if (page == 1)
             getMvpView().showLoading();
         mDataManager.getGanks(size, page)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<List<Result>>() {
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new CustomObserver<List<Result>>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
                         mDisposable = d;
@@ -73,14 +74,18 @@ public class PhotoGalleryPresenter extends BasePresenter<IPhotoGalleryView> {
                         }
                     }
 
+//                    @Override
+//                    public void onError(@NonNull Throwable e) {
+//
+//                    }
+
                     @Override
-                    public void onError(@NonNull Throwable e) {
+                    protected void onError(ApiException e) {
+                        Log.d(TAG, "onError: " + e.getCode() + " , " + e.getErrorMessage());
                         if (page == 1)
                             getMvpView().hideLoading();
                         getMvpView().showError();
-                        if (e instanceof SocketTimeoutException) {
-                            Log.d(TAG, "onError: SocketTimeoutException");
-                        }
+
                     }
 
                     @Override
